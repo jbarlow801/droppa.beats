@@ -35,6 +35,11 @@ Configure Filebeat by reading from ``beats:filebeat:config`` pillar key.
 
 Purges the environment created by ``beats.filebeat.*`` states.
 
+``beats.filebeat.pipeline``
+---------------------------
+
+Configures some pipelines that I found useful, which are referrenced in the filebeat pillar config.
+
 ``beats.metricbeat.install``
 ----------------------------
 
