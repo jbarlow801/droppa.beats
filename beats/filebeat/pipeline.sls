@@ -1,8 +1,8 @@
-http://10.237.2.64:9200/_ingest/pipeline/kube-pipeline:
-  http.query:
-    - method: PUT
-    - data: '{"description":"Salt pipleine","processors":[{"grok":{"field":"message","patterns":["%{TIMESTAMP_ISO8601:timestamp} \\[%{GREEDYDATA:function}\\]\\[%{GREEDYDATA:level}\\]\\[%{GREEDYDATA:process}\\] %{GREEDYDATA:event}"],"on_failure":[{"set":{"field":"error","value":"'{{' _ingest.on_failure_message '}}'"}}]}},{"remove":{"field":"message"}}]}'
-    - match: '{"acknowledged":true}'
+#http://10.237.2.64:9200/_ingest/pipeline/kube-pipeline:
+#  http.query:
+#    - method: PUT
+#    - data: '{"description":"Salt pipleine","processors":[{"grok":{"field":"message","patterns":["%{TIMESTAMP_ISO8601:timestamp} \\[%{GREEDYDATA:function}\\]\\[%{GREEDYDATA:level}\\]\\[%{GREEDYDATA:process}\\] %{GREEDYDATA:event}"],"on_failure":[{"set":{"field":"error","value":"'{{' _ingest.on_failure_message '}}'"}}]}},{"remove":{"field":"message"}}]}'
+#    - match: '{"acknowledged":true}'
 
 http://10.237.2.64:9200/_ingest/pipeline/kibana-pipeline:
   http.query:
