@@ -1,81 +1,81 @@
-{% set esnodes = ["esnode01:9200", "esnode02:9200", "esnode03:9200"] -%}
-{% set filebeat_log_path = "/var/log/filebeat.log" -%}
-{% set metricbeat_log_path = "/var/log/metricbeat.log" -%}
+{% set esnodes = '["esnode01:9200", "esnode02:9200", "esnode03:9200"]' %}
+{% set filebeat_log_path = "/var/log/filebeat" %}
+{% set metricbeat_log_path = "/var/log/metricbeat" %}
 beats:
-    filebeat:
-        config:
-            filebeat.prospectors:
-                - input_type: log
-                  paths:
-                    - /var/log/syslog.log
-                  fields.kind: "syslog"
-                - input_type: log
-                  fields.kind: "salt"
-                  paths:
-                    - /var/log/salt/master
-                    - /var/log/salt/minion
-                    - /var/log/salt/api
-                  pipeline: "salt-pipeline"
-                - input_type: log
-                  fields.kind: "containers"
-                  paths: ["/var/log/containers/*.log"]
-                  symlinks: true
-                  json.message_key: log
-                  json.keys_under_root: true
-                  multiline.pattern: '^\s'
-                  multiline.match: after
-                  document_kind: kube-logs
-                  pipeline: 'containers-pipeline"
-                - input_type: log
-                  fields.kind: "kube"
-                  paths: ["/var/log/kube*.log"]
-                - input_type: log
-                  fields.kind: "etcd"
-                  paths: ["/var/log/etcd.log"]
-                - input_type: log
-                  fields.kind: "haproxy"
-                  paths: ["/var/log/haproxy.log"]
-                  pipeline: "haproxy-pipeline"
-                - input_type: log
-                  fields.kind: "filebeat"
-                  paths: {{ filebeat_log_path }}
-            processors:
-                - drop_fields:
-                  fields: ["offset", "beat.name", "beat.version"]
-            output.elasticsearch:
-                hosts: {{ esnodes }}
-                fields: "%{[fields.kind]:logs}"
-            logging.to_files: true
-            logging.files:
-                path: {{ filebeat_log_path }}
-                name: filebeat
-                rotateeverybytes: 10485760
-                keepfiles: 7
-    metricbeat:
-        config:
-            cbeat.config.modules:
-                path: ${path.config}/conf.d/*.yml
-                reload.period: 10s
-                reload.enabled: false
-            metricbeat.modules:
-                - module: system
-                  metricsets:
-                    - cpu
-                    - load
-                    - filesystem
-                    - fsstat
-                    - memory
-                    - network
-                    - process
-                  enabled: true
-                  period: 10s
-                  processes: ['.*']
-            output.elasticsearch:
-                hosts: {{ esnodes }}
-                index: "metrics"
-            logging.to_files: true
-            logging.files:
-                path: {{ metricbeat_log_path }}
-                name: metricbeat
-                rotateeverybytes: 10485760
-                keepfiles: 7
+  filebeat:
+    config:
+      filebeat.prospectors:
+        - input_type: log
+          paths:
+          - /var/log/syslog.log
+          fields.kind: "syslog"
+        - input_type: log
+          fields.kind: "salt"
+          paths:
+          - /var/log/salt/master
+          - /var/log/salt/minion
+          - /var/log/salt/api
+          pipeline: "salt-pipeline"
+        - input_type: log
+          fields.kind: "containers"
+          paths: ["/var/log/containers/*.log"]
+          symlinks: true
+          json.message_key: log
+          json.keys_under_root: true
+          multiline.pattern: '^\s'
+          multiline.match: after
+          document_kind: kube-logs
+          pipeline: "containers-pipeline"
+        - input_type: log
+          fields.kind: "kube"
+          paths: ["/var/log/kube*.log"]
+        - input_type: log
+          fields.kind: "etcd"
+          paths: ["/var/log/etcd.log"]
+        - input_type: log
+          fields.kind: "haproxy"
+          paths: ["/var/log/haproxy.log"]
+          pipeline: "haproxy-pipeline"
+        - input_type: log
+          fields.kind: "filebeat"
+          paths: {{ filebeat_log_path }}
+      processors:
+        - drop_fields: 
+            fields: ["offset", "beat.name", "beat.version"]
+      output.elasticsearch:
+        hosts: {{ esnodes }}
+        fields: "%{[fields.kind]:logs}"
+      logging.to_files: true
+      logging.files:
+        path: {{ filebeat_log_path }}
+        name: filebeat
+        rotateeverybytes: 10485760
+        keepfiles: 7
+  metricbeat:
+    config:
+      cbeat.config.modules:
+        path: ${path.config}/conf.d/*.yml
+        reload.period: 10s
+        reload.enabled: false
+      metricbeat.modules:
+        - module: system
+          metricsets:
+          - cpu
+          - load
+          - filesystem
+          - fsstat
+          - memory
+          - network
+          - process
+          enabled: true
+          period: 10s
+          processes: ['.*']
+      output.elasticsearch:
+        hosts: {{ esnodes }}
+        index: "metrics"
+      logging.to_files: true
+      logging.files:
+        path: {{ metricbeat_log_path }}
+        name: metricbeat
+        rotateeverybytes: 10485760
+        keepfiles: 7
