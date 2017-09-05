@@ -44,7 +44,7 @@ beats:
             fields: ["offset", "beat.name", "beat.version"]
       output.elasticsearch:
         hosts: {{ esnodes }}
-        fields: "%{[fields.kind]:logs}"
+        index: "%{[fields.kind]:logs}"
       logging.to_files: true
       logging.files:
         path: {{ filebeat_log_path }}
